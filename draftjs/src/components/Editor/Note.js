@@ -10,6 +10,7 @@ import '../../css/note.css';
 import 'antd/dist/antd.css';
 import NavigationBar from "../NavigationBar";
 import ConvertToPDF from "./ToolBarOptions/ConvertToPDF";
+import PrintPDF from "./ToolBarOptions/PrintPDF";
 import HyphenationOption from "./ToolBarOptions/Hyphenation";
 import NoteColor from "./ToolBarOptions/NoteColor";
 import SpeechOption from "./ToolBarOptions/TextToSpeech";
@@ -143,15 +144,15 @@ class Note extends React.Component {
     changeToolBar(key){
         if (key === "tools"){
             this.setState({
-                toolsButtonHighlight: {'backgroundColor': '#466fb5', 'color': 'white', isSelected: true},
-                noteSettingsButtonHighlight: {'border': 'none', isSelected: false},
+                toolsButtonHighlight: {'backgroundColor': '#466fb5', 'color': 'white', isSelected: true, 'maxWidth' : '100px'},
+                noteSettingsButtonHighlight: {'border': 'none', isSelected: false, 'maxWidth' : '100px'},
                 'toolbar': {}, 'toolbarCustomButtons': []
             })
         }
         else if (key === "noteSettings") {
             this.setState({
-                noteSettingsButtonHighlight: {'backgroundColor': '#466fb5', 'color': 'white', isSelected: true},
-                toolsButtonHighlight: {'border': 'none', isSelected: false},
+                noteSettingsButtonHighlight: {'backgroundColor': '#466fb5', 'color': 'white', isSelected: true, 'maxWidth' : '100px'},
+                toolsButtonHighlight: {'border': 'none', isSelected: false, 'maxWidth' : '100px'},
                 'toolbar': {'options': []},
                 'toolbarCustomButtons': [
                     <HyphenationOption hyphenate={hyphenate} noteID={this.state.noteID} isHyphenated={this.state.isHyphenated}/>,
@@ -180,12 +181,12 @@ class Note extends React.Component {
     showSelectedButton(buttonType){
       if (buttonType === "tools"){
           if (!this.state.toolsButtonHighlight.isSelected){
-              this.setState({'toolsButtonHighlight': {'backgroundColor': '#466fb5', 'color': 'white', isSelected: false}})
+              this.setState({'toolsButtonHighlight': {'backgroundColor': '#466fb5', 'color': 'white', isSelected: false, 'maxWidth' : '100px'}})
           }
       }
         if (buttonType === "noteSettings"){
             if (!this.state.noteSettingsButtonHighlight.isSelected){
-                this.setState({'noteSettingsButtonHighlight': {'backgroundColor': '#466fb5', 'color': 'white', isSelected: false}})
+                this.setState({'noteSettingsButtonHighlight': {'backgroundColor': '#466fb5', 'color': 'white', isSelected: false, 'maxWidth' : '100px'}})
             }
         }
 
@@ -194,12 +195,12 @@ class Note extends React.Component {
     hideSelectedButton(buttonType){
         if (buttonType === "tools"){
             if (!this.state.toolsButtonHighlight.isSelected){
-                this.setState({'toolsButtonHighlight': {'border': 'none', isSelected: false}})
+                this.setState({'toolsButtonHighlight': {'border': 'none', isSelected: false, 'maxWidth' : '100px'}})
             }
         }
         if (buttonType === "noteSettings"){
             if (!this.state.noteSettingsButtonHighlight.isSelected){
-                this.setState({'noteSettingsButtonHighlight': {'border': 'none', isSelected: false}})
+                this.setState({'noteSettingsButtonHighlight': {'border': 'none', isSelected: false, 'maxWidth' : '100px'}})
             }
 
         }
@@ -232,6 +233,7 @@ class Note extends React.Component {
                     <Icon type="book" theme="filled" style={{'color': this.state.noteCategoryIconColor}} className={"note-category-icon"} />
                     <Input className={"enter-category-here"} placeholder={"Category"} value={this.state.noteCategory} onChange={noteCategory => this.changeNoteCategory(noteCategory.target.value)}></Input>
                     <ConvertToPDF noteID={this.state.noteID} noteHTML={stateToHTML(this.state.editorState.getCurrentContent())} noteColor={this.state.noteColor}/>
+                    <PrintPDF noteID={this.state.noteID} noteHTML={stateToHTML(this.state.editorState.getCurrentContent())} noteColor={this.state.noteColor}/>
                 </Default>
                 <Mobile>
                     <Input className={"enter-title-here"} placeholder={"Untitled"} onKeyPress={this._handleKeyPress} value={this.state.noteTitle} onChange={noteTitle => this.setState({noteTitle: noteTitle.target.value})}></Input>
@@ -240,6 +242,7 @@ class Note extends React.Component {
                     <Input className={"enter-category-here"} placeholder={"Category"} value={this.state.noteCategory} onChange={noteCategory => this.changeNoteCategory(noteCategory.target.value)}></Input>
                     </div>
                     <ConvertToPDF noteID={this.state.noteID} noteHTML={stateToHTML(this.state.editorState.getCurrentContent())} noteColor={this.state.noteColor}/>
+                    <PrintPDF noteID={this.state.noteID} noteHTML={stateToHTML(this.state.editorState.getCurrentContent())} noteColor={this.state.noteColor}/>
                 </Mobile>
                 </div>
                 <div className={"tab-bar"}>
@@ -272,6 +275,7 @@ class Note extends React.Component {
                     toolbarCustomButtons={this.state.toolbarCustomButtons}
                     toolbar={this.state.toolbar}
                 />
+                <iframe id="ifmcontentstoprint" style= {{height:"0px", width:"0px", position:"absolute"}}></iframe>
             </div>
                 <br/>
             </div>
@@ -366,7 +370,9 @@ function hyphenate(child, noteID) {
 function changeNoteColor(noteID, color) {
     var changeNoteColor = {
         method: 'POST',
+        //url: 'http://127.0.0.1:5000/change-note-color',
         url: 'https://writefree-backend.herokuapp.com/change-note-color',
+        //url:'${backendURL}/change-note-color',
         qs: {noteID, noteColor: color.hex},
         headers: {'Content-Type': 'application/x-www-form-urlencoded' }
     };
